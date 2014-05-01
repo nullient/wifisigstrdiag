@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Wi-Fi Signal Strength Diagnostic</string>
+    <string name="title_section1">Diagnostics</string>
+    <string name="title_section2">Help/About</string>
+
+    <!-- MAIN -->
+    <string name="ssid">SSID:\u0020</string>
+    <string name="measure">Go</string>
+    <string name="measure_disabled">Scanning…</string>
+    <string name="signal_strength">Signal Strength:\u0020</string>
+
+    <!-- ABOUT -->
+    <string name="about_text">This app shows the signal strength and other info for a chosen Wi-Fi access point.\n\nSimply enter the name of a Wi-Fi access point (you can also tap \'SSID:\' to use a default), and press \'Go\' to start a scan. Once the scan completes, you\'ll see various information about that Wi-Fi network.\n\nCreated with haste for use at Northeastern University.</string>
+
+</resources>

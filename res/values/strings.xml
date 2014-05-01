@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="app_name">Wireless Signal Strength Diagnostic</string>
-    <string name="title_section1">Diagnostics</string>
-    <string name="title_section2">Help/About</string>
-
-</resources>
