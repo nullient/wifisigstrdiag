@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="@integer/pref_num_scans_default"
+        android:key="@string/pref_num_scans_key"
+        android:numeric="integer"
+        android:summary="@string/pref_num_scans_summary"
+        android:title="@string/pref_num_scans_title"/>
+
+    <ListPreference
+        android:defaultValue="average"
+        android:entries="@array/pref_results_algo_values_titles"
+        android:entryValues="@array/pref_results_algo_values_keys"
+        android:key="@string/pref_results_algo_key"
+        android:summary="@string/pref_results_algo_summary"
+        android:title="@string/pref_results_algo_title"/>
+</PreferenceScreen>

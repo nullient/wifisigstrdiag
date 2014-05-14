@@ -21,8 +21,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 17
-        versionCode 2
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1.0"
     }
 
     signingConfigs {
@@ -36,7 +36,7 @@ android {
     buildTypes {
         release {
             runProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.release
         }
     }
@@ -64,6 +64,7 @@ if (propFile.canRead()){
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile group: 'com.google.guava', name: 'guava', version: '17.0'
     compile 'com.android.support:support-v13:19.+'
     compile 'com.jakewharton:butterknife:5.0.0'
     compile 'com.crashlytics.android:crashlytics:1.+'

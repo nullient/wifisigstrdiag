@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_num_scans_key">num_scans</string>
+    <string name="pref_num_scans_title">Number of scans</string>
+    <string name="pref_num_scans_summary">The number of Wi-Fi scans to perform before displaying the results</string>
+    <integer name="pref_num_scans_default">3</integer>
+
+    <string name="pref_results_algo_key">results_algo</string>
+    <string name="pref_results_algo_title">Results algorithm</string>
+    <string name="pref_results_algo_summary">If multiple scans are performed, how the results should be calculated</string>
+    <string-array name="pref_results_algo_values_keys">
+        <item>average</item>
+        <item>median</item>
+        <item>max</item>
+        <item>min</item>
+    </string-array>
+    <string-array name="pref_results_algo_values_titles">
+        <item>Average</item>
+        <item>Median</item>
+        <item>Max</item>
+        <item>Min</item>
+    </string-array>
+
+</resources>

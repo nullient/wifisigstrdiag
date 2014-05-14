@@ -1,14 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/main_width"
-    android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity$DummySectionFragment">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="@dimen/main_width"
+              android:layout_height="match_parent"
+              android:layout_gravity="center_horizontal"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin"
+              tools:context=".MainActivity$DummySectionFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,33 +16,48 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/label"
-            android:text="@string/ssid" />
+            android:text="@string/ssid"/>
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/ssid"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
+            android:singleLine="true"
+            android:imeOptions="flagNoExtractUi|actionSearch"
+            android:completionHint="@string/ssidHint"
+            android:completionThreshold="1"
             android:freezesText="true"
-            android:inputType="none" />
+            android:hint="@string/ssidHint"
+            android:inputType="none"/>
+
     </LinearLayout>
 
     <Button
         android:id="@+id/go"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/measure"
         android:enabled="false"
-        android:textAppearance="@android:style/TextAppearance.Large" />
+        android:text="@string/measure"
+        android:textAppearance="@android:style/TextAppearance.Large"/>
 
-    <TextView
-        android:id="@+id/results"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:freezesText="true" />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1.0">
+
+        <TextView
+            android:id="@+id/results"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fadingEdge="vertical"
+            android:freezesText="true"
+            android:typeface="monospace"/>
+
+    </ScrollView>
 
 </LinearLayout>
