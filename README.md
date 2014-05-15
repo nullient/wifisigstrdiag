@@ -8,6 +8,9 @@ Created for use at Northeastern University.
 
 The Internet permission is used for Crashlytics bug reports.
 
+![screenshot](http://i.imgur.com/G2TXk0W.png)
+![screenshot](http://i.imgur.com/FZwNylG.png)
+
 Download
 --------
 This app is published in [Google Play](https://play.google.com/store/apps/details?id=edu.neu.rrc.wifisigstrdiag).
