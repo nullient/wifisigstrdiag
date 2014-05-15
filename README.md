@@ -8,8 +8,7 @@ Created for use at Northeastern University.
 
 The Internet permission is used for Crashlytics bug reports.
 
-![screenshot](http://i.imgur.com/G2TXk0W.png)
-![screenshot](http://i.imgur.com/FZwNylG.png)
+![screenshot](http://i.imgur.com/G2TXk0W.png)&nbsp;&nbsp;&nbsp;&nbsp;![screenshot](http://i.imgur.com/FZwNylG.png)
 
 Download
 --------
