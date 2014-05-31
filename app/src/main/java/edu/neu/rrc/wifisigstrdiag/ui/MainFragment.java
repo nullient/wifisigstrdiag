@@ -78,7 +78,14 @@ public class MainFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mGo.setEnabled(!mSsid.getText().toString().trim().isEmpty());
+                Editable ssidText = mSsid.getText();
+                // bug happened here somehow. better be explicit
+                if (ssidText != null) {
+                    String ssidStr = ssidText.toString();
+                    if (ssidStr != null) {
+                        mGo.setEnabled(!ssidStr.trim().isEmpty());
+                    }
+                }
             }
         });
         mSsid.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -148,6 +155,11 @@ public class MainFragment extends Fragment {
 
     private void repopulateSsidSuggestions() {
         List<ScanResult> networks = mWifiManager.getScanResults();
+        if (networks == null) {
+            // no networks? Wi-Fi off?
+            Toast.makeText(getActivity(), "Please enable Wi-Fi!", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         // not as sexy as Guava's FluentIterable, but w/e
         Set<String> ssids = new HashSet<>();
