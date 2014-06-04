@@ -38,4 +38,9 @@ public final class Utils {
         return true;
     }
 
+    public static int compareIntegers(int x, int y) {
+        // from http://www.docjar.com/html/api/java/lang/Integer.java.html
+        // Android needs min API 19
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
 }

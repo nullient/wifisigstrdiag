@@ -7,11 +7,25 @@
         android:summary="@string/pref_num_scans_summary"
         android:title="@string/pref_num_scans_title"/>
 
+    <EditTextPreference
+        android:defaultValue="@integer/pref_scan_delay_default"
+        android:key="@string/pref_scan_delay_key"
+        android:numeric="integer"
+        android:summary="@string/pref_scan_delay_summary"
+        android:title="@string/pref_scan_delay_title"/>
+
     <ListPreference
-        android:defaultValue="average"
+        android:defaultValue="@string/pref_results_algo_default"
         android:entries="@array/pref_results_algo_values_titles"
         android:entryValues="@array/pref_results_algo_values_keys"
         android:key="@string/pref_results_algo_key"
         android:summary="@string/pref_results_algo_summary"
         android:title="@string/pref_results_algo_title"/>
+
+    <CheckBoxPreference
+        android:defaultValue="@bool/pref_5ghz_only_default"
+        android:key="@string/pref_5ghz_only_key"
+        android:summary="@string/pref_5ghz_only_summary"
+        android:title="@string/pref_5ghz_only_title"/>
+
 </PreferenceScreen>

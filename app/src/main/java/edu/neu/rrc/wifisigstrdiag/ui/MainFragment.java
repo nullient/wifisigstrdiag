@@ -1,26 +1,58 @@
 
 package edu.neu.rrc.wifisigstrdiag.ui;
 
-import android.app.*;
-import android.content.*;
-import android.content.pm.*;
-import android.graphics.*;
-import android.net.wifi.*;
-import android.os.*;
-import android.preference.*;
-import android.text.*;
-import android.util.*;
-import android.view.*;
-import android.view.inputmethod.*;
-import android.widget.*;
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Pair;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.common.collect.*;
-import com.google.common.primitives.*;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Ints;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import butterknife.*;
-import edu.neu.rrc.wifisigstrdiag.*;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import edu.neu.rrc.wifisigstrdiag.R;
+import edu.neu.rrc.wifisigstrdiag.Utils;
 
 public class MainFragment extends Fragment {
 
@@ -29,7 +61,7 @@ public class MainFragment extends Fragment {
     }
 
     private static final String NUWAVE_SSID = "NUwave";
-    private static final int LEVEL = 100;
+    private static final int THRESHOLD_5GHZ = 5000;
 
     @InjectView(R.id.ssid) AutoCompleteTextView mSsid;
     @InjectView(R.id.go) Button mGo;
@@ -129,22 +161,18 @@ public class MainFragment extends Fragment {
 
     @OnClick(R.id.go)
     public void onGoPressed() {
-        if (!mWifiManager.isWifiEnabled()) {
-            Toast.makeText(getActivity(), "Please enable Wi-Fi!", Toast.LENGTH_LONG).show();
-        } else {
-            // begin the first scan!
-            mNumberOfScans = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_num_scans_key), "3"));
-            mCurrentScan = 1;
-            mSsidToSearch = mSsid.getText().toString();
+        // begin the first scan!
+        mNumberOfScans = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_num_scans_key), "3"));
+        mCurrentScan = 1;
+        mSsidToSearch = mSsid.getText().toString();
 
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(mSsid.getWindowToken(), 0);
-            if (mWifiManager.startScan()) {
-                updateUiScanning();
-            } else {
-                reenableUi();
-                Toast.makeText(getActivity(), "Could not start Wi-Fi scan. Please try again later.", Toast.LENGTH_LONG).show();
-            }
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mSsid.getWindowToken(), 0);
+        if (mWifiManager.startScan()) {
+            updateUiScanning();
+        } else {
+            reenableUi();
+            Toast.makeText(getActivity(), "Could not start Wi-Fi scan. Please try again later.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -157,7 +185,7 @@ public class MainFragment extends Fragment {
         List<ScanResult> networks = mWifiManager.getScanResults();
         if (networks == null) {
             // no networks? Wi-Fi off?
-            Toast.makeText(getActivity(), "Please enable Wi-Fi!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "No networks found.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -172,12 +200,20 @@ public class MainFragment extends Fragment {
         mSsid.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, ssidsArray));
     }
 
-    private BroadcastReceiver mWifiReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mWifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // return if this wasn't our request
             if (mCurrentScan < 1)
                 return;
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String chosenAlgo = prefs.getString(getString(R.string.pref_results_algo_key),
+                    getString(R.string.pref_results_algo_default));
+            boolean only5Ghz = prefs.getBoolean(getString(R.string.pref_5ghz_only_key),
+                    getResources().getBoolean(R.bool.pref_5ghz_only_default));
+            int scanDelay = Integer.parseInt(prefs.getString(getString(R.string.pref_scan_delay_key),
+                    "" + getResources().getInteger(R.integer.pref_scan_delay_default)));
 
             // collect our data
             for (ScanResult result : mWifiManager.getScanResults()) {
@@ -192,45 +228,34 @@ public class MainFragment extends Fragment {
                 mCurrentScan++;
                 updateUiScanning();
 
-                // if we failed, re-enable the UI
-                if (!mWifiManager.startScan()) {
-                    reenableUi();
-                    Toast.makeText(getActivity(), String.format("Could not start Wi-Fi scan %1$d. Please try again later.", mCurrentScan), Toast.LENGTH_LONG).show();
-                }
+                // wait some time before starting the next scan
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // if we failed, re-enable the UI
+                        if (!mWifiManager.startScan()) {
+                            reenableUi();
+                            Toast.makeText(getActivity(), String.format("Could not start Wi-Fi scan %1$d. Please try again later.", mCurrentScan), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, scanDelay * 1000);
                 return;
             }
 
             reenableUi();
 
-            String chosenAlgo = PreferenceManager.getDefaultSharedPreferences(getActivity())
-                    .getString(getString(R.string.pref_results_algo_key), "average");
+            // compile the averaged results...
+            SortedSet<AverageScanResult> orderedResults = new TreeSet<>(new Comparator<AverageScanResult>() {
+                @Override
+                public int compare(AverageScanResult scanResult, AverageScanResult scanResult2) {
+                    return Utils.compareIntegers(scanResult2.level, scanResult.level);
+                }
+            });
 
-            // display the results!
-            StringBuilder results = new StringBuilder();
             for (Pair<String, Integer> bssidAndFreq : mScanResults.keySet()) {
                 Collection<ScanResult> bssidAndFreqResults = mScanResults.get(bssidAndFreq);
 
                 ScanResult firstResult = bssidAndFreqResults.iterator().next();
-
-                // print BSSID
-                results.append("\nBSSID: ");
-                results.append(firstResult.BSSID);
-
-                // print SSID
-                results.append("\nSSID: ");
-                results.append(firstResult.SSID);
-
-                // print frequency
-                results.append("\nFrequency: ");
-                results.append(firstResult.frequency);
-
-                // print number of entries
-                results.append("\nNumber of data points: ");
-                results.append(bssidAndFreqResults.size());
-
-                // print the algorithm used
-                results.append("\nAlgorithm: ");
-                results.append(chosenAlgo);
 
                 // compute the level based on the algorithm
                 ResultsAlgorithm algo;
@@ -269,15 +294,48 @@ public class MainFragment extends Fragment {
                     return;
                 }
 
-                // print the level
-                results.append("\nLevel (dBm): ");
-                results.append(level);
+                // skip those under 5GHz if the option is selected
+                if (only5Ghz && firstResult.frequency < THRESHOLD_5GHZ)
+                    continue;
 
-                results.append("\n=====\n\n");
+                // add to list!
+                orderedResults.add(new AverageScanResult(firstResult.BSSID, firstResult.SSID,
+                        firstResult.frequency, bssidAndFreqResults.size(), chosenAlgo, level));
             }
 
             // clear out the data
             mScanResults.clear();
+
+            // generate output
+            StringBuilder results = new StringBuilder();
+            for (AverageScanResult result : orderedResults) {
+                // print BSSID
+                results.append("\nBSSID: ");
+                results.append(result.BSSID);
+
+                // print SSID
+                results.append("\nSSID: ");
+                results.append(result.SSID);
+
+                // print frequency
+                results.append("\nFrequency: ");
+                results.append(result.frequency);
+
+                // print number of entries
+                results.append("\nNumber of data points: ");
+                results.append(result.numberOfDataPoints);
+
+                // print the algorithm used
+                results.append("\nAlgorithm: ");
+                results.append(result.algorithm);
+
+                // print the level
+                results.append("\nLevel (dBm): ");
+                results.append(result.level);
+
+                results.append("\n=====\n\n");
+            }
+
 
             if (results.length() != 0) {
                 mResults.setText(results.toString());
@@ -335,6 +393,26 @@ public class MainFragment extends Fragment {
 
     private void unlockOrientation() {
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    static class AverageScanResult {
+
+        public final String BSSID;
+        public final String SSID;
+        public final int frequency;
+        public final int numberOfDataPoints;
+        public final String algorithm;
+        public final int level;
+
+        public AverageScanResult(String BSSID, String SSID, int frequency, int numberOfDataPoints, String algorithm, int level) {
+            this.BSSID = BSSID;
+            this.SSID = SSID;
+            this.frequency = frequency;
+            this.numberOfDataPoints = numberOfDataPoints;
+            this.algorithm = algorithm;
+            this.level = level;
+        }
+
     }
 
 }

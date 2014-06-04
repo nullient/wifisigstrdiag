@@ -5,9 +5,15 @@
     <string name="pref_num_scans_summary">The number of Wi-Fi scans to perform before displaying the results</string>
     <integer name="pref_num_scans_default">3</integer>
 
+    <string name="pref_scan_delay_key">scan_delay</string>
+    <string name="pref_scan_delay_title">Scan delay</string>
+    <string name="pref_scan_delay_summary">How many seconds to wait in between scans (does not include additional system scan time). It is recommended to have this at least 2 seconds to allow sufficient scanning time on some devices</string>
+    <integer name="pref_scan_delay_default">2</integer>
+
     <string name="pref_results_algo_key">results_algo</string>
     <string name="pref_results_algo_title">Results algorithm</string>
     <string name="pref_results_algo_summary">If multiple scans are performed, how the results should be calculated</string>
+    <string name="pref_results_algo_default">average</string>
     <string-array name="pref_results_algo_values_keys">
         <item>average</item>
         <item>median</item>
@@ -20,5 +26,10 @@
         <item>Max</item>
         <item>Min</item>
     </string-array>
+
+    <string name="pref_5ghz_only_key">5ghz_only</string>
+    <string name="pref_5ghz_only_title">Show 5GHz networks only</string>
+    <string name="pref_5ghz_only_summary">Show only Wi-Fi networks with frequencies greater than 5.000 GHz</string>
+    <bool name="pref_5ghz_only_default">false</bool>
 
 </resources>
